@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
@@ -26,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         TestConfig.class,
 })
 @Qualifier("mockVectorStore")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class AppointmentRepositoryFlowTests {
 
     @Autowired
@@ -111,6 +113,10 @@ class AppointmentRepositoryFlowTests {
         Optional<Dog> dogStillPresent = dogRepository.findById(dogId);
         assertThat(dogStillPresent).isPresent();
         assertThat(dogStillPresent.get().getAppointment()).isNull();
+
+        // Remove test dog
+        dogRepository.deleteById(dogId);
+        assertThat(dogRepository.findById(dogId)).isEmpty();
     }
 
 }
