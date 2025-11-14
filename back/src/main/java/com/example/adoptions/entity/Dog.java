@@ -5,6 +5,8 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.Objects;
+
 @Entity
 @EntityListeners(DogListener.class)
 public class Dog {
@@ -60,5 +62,22 @@ public class Dog {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Dog dog = (Dog) o;
+        return Objects.equals(
+                getId(), dog.getId())
+                && Objects.equals(getName(), dog.getName())
+                && Objects.equals(getDescription(), dog.getDescription())
+                && Objects.equals(getAppointment(), dog.getAppointment()
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), getDescription(), getAppointment());
     }
 }

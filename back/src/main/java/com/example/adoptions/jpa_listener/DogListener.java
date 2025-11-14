@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Component
 public class DogListener {
-    private static final Map<Integer, Integer> refCache = new HashMap<>();
+    private static final Map<Integer, Dog> dogCache = new HashMap<>();
 
     private VectorStore vectorStore;
 
@@ -28,7 +28,7 @@ public class DogListener {
     @PostLoad
     public void postLoad(Dog dog) {
         // Cache the current name after loading from DB
-        refCache.put(dog.getId(), dog.getAppointment() != null ? dog.getAppointment().getId() : 0);
+        dogCache.put(dog.getId(), dog);
     }
 
     @PostPersist
@@ -42,23 +42,28 @@ public class DogListener {
 
     @PostUpdate
     public void preUpdate(Dog dog) {
-        int oldRef = refCache.get(dog.getId());
+        Dog oldDogObg = dogCache.get(dog.getId());
         int newRef = dog.getAppointment() != null ? dog.getAppointment().getId() : 0;
-        if (oldRef != newRef) {
+        if (!dog.equals(oldDogObg)) {
             if (newRef == 0) {
+                removeDogIndex(dog.getId());
                 var document = new Document("id: %s, name: %s, description: %s".formatted(
                         dog.getId(), dog.getName(), dog.getDescription()
                 ), Map.of("id", dog.getId(), "name", dog.getName(), "description", dog.getDescription())
                 );
                 vectorStore.add(List.of(document));
             } else {
-                vectorStore.delete("id == %s".formatted(dog.getId()));
+                removeDogIndex(dog.getId());
             }
         }
     }
 
     @PostRemove
     public void removeDogIndex(Dog dog) {
-        vectorStore.delete("id == %s".formatted(dog.getId()));
+        removeDogIndex(dog.getId());
+    }
+
+    private void removeDogIndex(int id) {
+        vectorStore.delete("id == %s".formatted(id));
     }
 }
