@@ -17,6 +17,23 @@ const App: React.FC = () => {
     setSessionId(uuidv4());
   }, []);
 
+  // 🔹 Fetch agency name once
+  const {
+    data: agencyName,
+    isLoading: agencyLoading,
+    isError: agencyError,
+  } = useQuery({
+    queryKey: ["agencyName"],
+    queryFn: async () => {
+      const response = await fetch(
+        `${process.env.REACT_APP_API}store/config/agency_name`
+      );
+      if (!response.ok) throw new Error("Failed to fetch agency name");
+      return await response.text();
+    },
+  });
+
+  // 🔹 Chat response query
   const {
     data: botResponse,
     refetch,
@@ -45,10 +62,9 @@ const App: React.FC = () => {
 
   const sendMessage = async () => {
     if (!question.trim()) return;
-
     currentQuestionRef.current = question;
     setMessages((prev) => [...prev, { sender: "user", text: question }]);
-    setQuestion(""); // Clear input immediately for UX
+    setQuestion(""); // Clear input immediately
     await refetch(); // Trigger bot response
   };
 
@@ -58,12 +74,16 @@ const App: React.FC = () => {
     }
   }, [messages]);
 
+  // 🔹 Fallback name if API not ready
+  const displayName = agencyName || "Dogs Adoption";
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1>🐾 Pooch Palace Chat</h1>
+        <h1>🐾 {displayName} Chat</h1>
         <p>Ask me anything about adopting a furry friend!</p>
       </header>
+
       <div className={styles.chatBox} ref={chatBoxRef}>
         {messages.map((msg, idx) => (
           <div
@@ -73,21 +93,24 @@ const App: React.FC = () => {
             <ReactMarkdown>{msg.text}</ReactMarkdown>
           </div>
         ))}
+
         {isFetching && (
           <div className={styles.typingIndicator}>
             <span className={styles.dot}></span>
             <span className={styles.dot}></span>
             <span className={styles.dot}></span>
-            <span className={styles.label}>Pooch Palace is typing…</span>
+            <span className={styles.label}>{displayName} is typing…</span>
             <span className={styles.paws}>🐾🐾🐾</span>
           </div>
         )}
+
         {isError && (
           <div className={styles.botMsg}>
-            Oops! Something went wrong fetching Pooch Palace's reply.
+            Oops! Something went wrong fetching {displayName}'s reply.
           </div>
         )}
       </div>
+
       <div className={styles.inputArea}>
         <input
           type="text"

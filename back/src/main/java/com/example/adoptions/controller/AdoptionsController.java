@@ -1,5 +1,6 @@
 package com.example.adoptions.controller;
 
+import com.example.adoptions.config.StoreConfig;
 import com.example.adoptions.repository.DogRepository;
 import com.example.adoptions.tool.DataTimeAware;
 import com.example.adoptions.tool.DogAdoptionScheduler;
@@ -18,16 +19,16 @@ import org.springframework.web.bind.annotation.*;
 public class AdoptionsController {
     private final ChatClient ai;
     private final VectorStore vectorStore;
-    private final Environment env;
+    private final StoreConfig storeConfig;
 
     AdoptionsController(DogAdoptionScheduler scheduler,
                         DataTimeAware dataTimeAware,
                         PromptChatMemoryAdvisor promptChatMemoryAdvisor,
                         ChatClient.Builder ai,
-                        Environment env,
+                        StoreConfig storeConfig,
                         VectorStore vectorStore) {
         this.vectorStore = vectorStore;
-        this.env = env;
+        this.storeConfig = storeConfig;
 
         String system = """
                 You are an AI powered assistant to help people adopt a dog from the adoption agency named "
@@ -39,10 +40,10 @@ public class AdoptionsController {
                 +" for appointment scheduling. If there is no information, then return a polite response "
                 +"suggesting we don't have any dogs available.
                 """.formatted(
-                env.getProperty("agency.name"),
-                env.getProperty("agency.phone"),
-                env.getProperty("agency.serve.from"),
-                env.getProperty("agency.serve.to")
+                storeConfig.getAgencyName(),
+                storeConfig.getAgencyPhone(),
+                storeConfig.getAgencyServeFrom(),
+                storeConfig.getAgencyServeTo()
         );
         this.ai = ai
                 .defaultTools(scheduler, dataTimeAware)

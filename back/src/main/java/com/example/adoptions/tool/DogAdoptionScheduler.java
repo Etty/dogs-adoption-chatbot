@@ -24,7 +24,8 @@ public class DogAdoptionScheduler {
 
     @Tool(description = "Schedule an appointment to pickup or adopt a " +
             "dog from a Pooch Palace location. You need dog's ID, date with time, user's name, user's phone number"
-            + " to be able to schedule an appointment")
+            + " to be able to schedule an appointment. "
+            +"Always ask to confirm if details you are going to submit are correct")
     String schedule(
             @ToolParam(description = "ID of a dog") Integer dogId,
             @ToolParam(description = "format: ISO-8601 (examples: 2025-11-13T18:00, 2025-01-15T09:00)"
@@ -33,7 +34,7 @@ public class DogAdoptionScheduler {
                     + "if provided information is enough to extract date, then accept it,"
                     + "don't show input format") String time,
             @ToolParam(description = "name") String visitorName,
-            @ToolParam(description = "phone with country code, format examples: 420771333425, 380962225081."
+            @ToolParam(description = "phone with country code, format examples: 420771333425, 380111111111."
                     + " Clarify user to input phone with country code. Fix time format by yourself: leave only "
                     + "digits in phone") String phone
     ) {
@@ -57,7 +58,7 @@ public class DogAdoptionScheduler {
 
     @Tool(description = "Show appointment data ONLY when user asks")
     String showAppointment(@ToolParam(description = "Phone number with country code,"
-            + " which user used fo appointment. Format examples: 420771333425, 380962225081."
+            + " which user used fo appointment. Format examples: 420771333425, 380111111111."
             + " Clarify user to input phone with country code. Fix time format by yourself: leave only "
             + "digits in phone") String phone) {
         Appointment appointment = appointmentRepository.findByPhone(phone);
@@ -71,14 +72,16 @@ public class DogAdoptionScheduler {
 
     @Tool(description = "Edit existing appointment. Ask the phone number, which user used for appointment, to find it."
             + " User is able to update any of these fields: "
-            + "time, name, description, or select another dog. Or just see his appointment and do not change anything")
+            + "time, name, description, or select another dog. "
+            + "Submit only required {oldPhone} param and data which user asks to change."
+            +"Always ask to confirm if details you are going to submit are correct")
     String updateAppointment(
             @ToolParam(description = " phone number with country code, which user used fo appointment. Format examples:"
-                    + "420771333425, 380962225081."
+                    + "420771333425, 380111111111."
                     + " Clarify user to input phone with country code. Fix time format by yourself: leave only "
                     + "digits in phone", required = false) String oldPhone,
             @ToolParam(description = "New name", required = false) String name,
-            @ToolParam(description = "New phone number with country code, format examples: 420771333425, 380962225081."
+            @ToolParam(description = "New phone number with country code, format examples: 420771333425, 380111111111."
                     + " Clarify user to input phone with country code. Fix time format by yourself: leave only "
                     + "digits in phone", required = false) String phone,
             @ToolParam(description = "New appointment time. Format: ISO-8601 "
@@ -119,7 +122,7 @@ public class DogAdoptionScheduler {
 
     @Tool(description = "Cancel or remove an appointment. You need a phone number to find necessary appointment")
     String deleteAppointment(@ToolParam(description = "Phone number with country code,"
-            + " which user used fo appointment. Format examples: 420771333425, 380962225081."
+            + " which user used fo appointment. Format examples: 420771333425, 380111111111."
             + " Clarify user to input phone with country code. Fix time format by yourself: leave only "
             + "digits in phone") String phone) {
         Appointment appointment = appointmentRepository.findByPhone(phone);
