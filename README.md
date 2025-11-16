@@ -66,9 +66,10 @@ In `application.properties' you can configure agency details (agency.*)
 7. Run `mvn spring-boot:run` from 'backend' folder
 8. If you need dummy data for dogs, it is into `src/main/resources/data.sql`. Also execute `SyncDogsController` 
 (needs to be removed for production)
-9. Run `npm install` from 'frontend' folder
-10. Run `npm start` from 'frontend' folder
-11. Open `http://localhost:3000/` in browser
+9. Add `.env` inside `front' folder and add frontend url (example: `REACT_APP_API='http://localhost:8080/'`)
+10. Run `npm install` from 'frontend' folder
+11. Run `npm start` from 'frontend' folder
+12. Open `http://localhost:3000/` in browser
 
 ## Video Demo
 [Watch the video](https://www.youtube.com/watch?v=cfq8XHfIKpA)
